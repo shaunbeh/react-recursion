@@ -3,14 +3,15 @@ import {
   DocumentIcon,
   FolderIcon,
 } from '@heroicons/react/24/solid';
+import clsx from 'clsx';
 import { useState } from 'react';
 
-type FolderT = {
+type NodeT = {
   name: string;
-  folders?: FolderT[];
+  folders?: NodeT[];
 };
 
-const folders: FolderT[] = [
+const nodes: NodeT[] = [
   {
     name: 'Home',
     folders: [
@@ -50,8 +51,8 @@ function App() {
   return (
     <div className='p-8 max-w-sm mx-auto'>
       <ul>
-        {folders.map((folder) => (
-          <Folder key={folder.name} folder={folder} />
+        {nodes.map((node) => (
+          <FileSystemItem key={node.name} node={node} />
         ))}
       </ul>
     </div>
@@ -60,31 +61,38 @@ function App() {
 
 export default App;
 
-const Folder = ({ folder }: { folder: FolderT }) => {
+const FileSystemItem = ({ node }: { node: NodeT }) => {
   const [isOpen, setIsOpen] = useState(false);
   const toggle = () => setIsOpen((isOpen) => !isOpen);
 
   return (
-    <li className='my-1.5' key={folder.name}>
+    <li className='my-1.5' key={node.name}>
       <span className='flex items-center gap-1.5'>
-        {folder.folders ? (
+        {node.folders ? (
           <>
-            {folder.folders.length > 0 && (
+            {node.folders.length > 0 ? (
               <button onClick={toggle}>
-                <ChevronRightIcon className='size-4 text-gray-500' />
+                <ChevronRightIcon
+                  className={clsx(
+                    'size-4 anim text-gray-500',
+                    isOpen ? 'rotate-90' : ''
+                  )}
+                />
               </button>
+            ) : (
+              <div className='w-4 invisible' />
             )}
             <FolderIcon className='size-6 text-sky-500' />
           </>
         ) : (
-          <DocumentIcon className='size-6 text-gray-700' />
+          <DocumentIcon className='ms-[22px] size-6 text-gray-700' />
         )}
-        {folder.name}
+        {node.name}
       </span>
       {isOpen && (
         <ul className='ps-6'>
-          {folder.folders?.map((folder) => (
-            <Folder key={folder.name} folder={folder} />
+          {node.folders?.map((node) => (
+            <FileSystemItem key={node.name} node={node} />
           ))}
         </ul>
       )}
